@@ -1,0 +1,10 @@
+services:
+  ynce:
+    build: .
+    restart: always
+    ports:
+      - "65000:65000"
+    devices:
+      - "/dev/ync:/dev/ync:rwm"
+    environment:
+      SERIAL_PORT: /dev/ync
