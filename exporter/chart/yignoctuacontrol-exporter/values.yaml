@@ -1,0 +1,8 @@
+---
+name: yignoctuacontrol-exporter
+namespace: monitoring-system
+image:
+  name: danielskowronski/yignoctuacontrol-exporter
+  tag: "0.1"
+  pullPolicy: IfNotPresent
+serialPort: /dev/ttyUSB0

@@ -25,6 +25,8 @@ With `/dev/ync` being our serial port, we can pass it to Docker Compose.
 
 ## Running in container
 
+https://hub.docker.com/r/danielskowronski/yignoctuacontrol-exporter
+
 In the near future, k8s will be supported. For now, Docker Compose must be enough. Example `compose.yaml` is provided.
 
 ## Prometheus data
@@ -88,4 +90,12 @@ ync_ambient_temp 28.59764
 # HELP ync_ambient_humid YNC Ambient Humidity (%)
 # TYPE ync_ambient_humid gauge
 ync_ambient_humid 55.64165
+```
+
+
+---
+
+```bash
+cd app
+docker build -t danielskowronski/yignoctuacontrol-exporter:0.1 
 ```

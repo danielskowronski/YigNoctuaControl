@@ -1,0 +1,1 @@
+Targets only nodes labelled `ynce.skowronski.tech/ync-connected: "true"`
