@@ -15,7 +15,7 @@ spec:
         k8s-app: {{ .Values.name }}
       annotations:
         prometheus.io/scrape: "true"
-        prometheus.io/port:   "65000"
+        prometheus.io/port:   {{ .Values.tcpPort }}
         prometheus.io/path:   "/metrics"
     spec:
       nodeSelector:
@@ -32,18 +32,26 @@ spec:
               cpu: 100m
               memory: 200Mi
           ports:
-            - containerPort: 65000
+            - containerPort: {{ .Values.tcpPort }}
               name: ynce-port
               protocol: TCP
           env:
             - name: SERIAL_PORT
               value: {{ .Values.serialPort }}
+            - name: LOGLEVEL
+              value: {{ .Values.loglevel | upper }}
+            - name: TCP_PORT
+              value: {{ .Values.tcpPort }}
+            - name: PYTHONUNBUFFERED
+              value: "1"  # ensure logs are flushed immediately
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           volumeMounts:
             - name: ync-device
-              mountPath: /dev/ync
+              mountPath: {{ .Values.serialPort }}
+      # FIXME: proper livecheck, protect against multiple instances running
       terminationGracePeriodSeconds: 30
       volumes:
         - name: ync-device
           hostPath:
-            path: /dev/ync
+            type: CharDevice
+            path: {{ .Values.serialPort }}

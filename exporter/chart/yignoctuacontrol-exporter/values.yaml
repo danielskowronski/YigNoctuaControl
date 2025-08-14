@@ -5,4 +5,6 @@ image:
   name: danielskowronski/yignoctuacontrol-exporter
   tag: "0.1"
   pullPolicy: IfNotPresent
-serialPort: /dev/ttyUSB0
+serialPort: /dev/ync
+loglevel: INFO # CRITICAL/ERROR/WARNING/INFO/DEBUG
+tcpPort: 65000
