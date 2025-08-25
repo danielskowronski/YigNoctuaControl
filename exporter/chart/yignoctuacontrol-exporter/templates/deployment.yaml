@@ -15,7 +15,7 @@ spec:
         k8s-app: {{ .Values.name }}
       annotations:
         prometheus.io/scrape: "true"
-        prometheus.io/port:   {{ .Values.tcpPort }}
+        prometheus.io/port:   "{{ .Values.exporter.tcpPort }}"
         prometheus.io/path:   "/metrics"
     spec:
       nodeSelector:
@@ -32,26 +32,27 @@ spec:
               cpu: 100m
               memory: 200Mi
           ports:
-            - containerPort: {{ .Values.tcpPort }}
+            - containerPort: {{ .Values.exporter.tcpPort }}
               name: ynce-port
               protocol: TCP
           env:
             - name: SERIAL_PORT
-              value: {{ .Values.serialPort }}
+              value: /host-dev/serial/by-id/{{ .Values.exporter.serialPortId }}
             - name: LOGLEVEL
-              value: {{ .Values.loglevel | upper }}
+              value: {{ .Values.exporter.loglevel | upper }}
             - name: TCP_PORT
-              value: {{ .Values.tcpPort }}
+              value: "{{ .Values.exporter.tcpPort }}"
             - name: PYTHONUNBUFFERED
               value: "1"  # ensure logs are flushed immediately
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           volumeMounts:
-            - name: ync-device
-              mountPath: {{ .Values.serialPort }}
+            - name: host-dev
+              mountPath: /host-dev
+              readOnly: true
       # FIXME: proper livecheck, protect against multiple instances running
       terminationGracePeriodSeconds: 30
       volumes:
-        - name: ync-device
+        - name: host-dev
           hostPath:
-            type: CharDevice
-            path: {{ .Values.serialPort }}
+            type: Directory
+            path: /dev

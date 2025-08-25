@@ -1,0 +1,70 @@
+{{- if .Values.alerts.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ .Values.name }}-rules
+  namespace: {{ .Values.namespace }}
+  labels:
+  {{- with .Values.alerts.crdLabels }}
+    {{ toYaml . }}
+  {{- end }}
+spec:
+  groups:
+    - name: YigNoctuaControl
+      rules:
+        - alert: YigNoctuaControllerFanDutyCritical
+          expr: ync_fan_duty{}>{{ .Values.alerts.dutyCritical.threshold }}
+          for: {{ .Values.alerts.dutyCritical.for }}
+          labels:
+            severity: {{ .Values.alerts.dutyCritical.severity }}
+            {{- with .Values.alerts.alertLabels }}
+            {{ toYaml . }}
+            {{- end }}
+          annotations:
+            summary: "YigNoctuaController Fan Duty Critical {{"{{"}} .CommonLabels.side }}"
+            description: "YigNoctuaController fan duty {{"{{"}} $value }}% on {{"{{"}} .CommonLabels.side }}"
+        - alert: YigNoctuaControllerProbeTempWarning
+          expr: ync_probe_temp{}>{{ .Values.alerts.tempWarning.threshold }}
+          for: {{ .Values.alerts.tempWarning.for }}
+          labels:
+            severity: {{ .Values.alerts.tempWarning.severity }}
+            {{- with .Values.alerts.alertLabels }}
+            {{ toYaml . }}
+            {{- end }}
+          annotations:
+            summary: "YigNoctuaController Temperature Warning {{"{{"}} .CommonLabels.side }}/{{"{{"}} .CommonLabels.ch }}"
+            description: "YigNoctuaController temperature is high {{"{{"}} $value }}°C on {{"{{"}} .CommonLabels.side }}/{{"{{"}} .CommonLabels.side }}"
+        - alert: YigNoctuaControllerProbeTempCritical
+          expr: ync_probe_temp{}>{{ .Values.alerts.tempCritical.threshold }}
+          for: {{ .Values.alerts.tempCritical.for }}
+          labels:
+            severity: {{ .Values.alerts.tempCritical.severity }}
+            {{- with .Values.alerts.alertLabels }}
+            {{ toYaml . }}
+            {{- end }}
+          annotations:
+            summary: "YigNoctuaController Temperature Critical {{"{{"}} .CommonLabels.side }}/{{"{{"}} .CommonLabels.ch }}"
+            description: "YigNoctuaController temperature is critically high {{"{{"}} $value }}°C on {{"{{"}} .CommonLabels.side }}/{{"{{"}} .CommonLabels.side }}"
+        - alert: YigNoctuaControllerAbsent
+          expr: absent(ync_fan_duty{}>=0)
+          for: {{ .Values.alerts.absent.for }}
+          labels:
+            severity: {{ .Values.alerts.absent.severity }}
+            {{- with .Values.alerts.alertLabels }}
+            {{ toYaml . }}
+            {{- end }}
+          annotations:
+            summary: "YigNoctuaController Absent"
+            description: "YigNoctuaController is absent for more than {{ .Values.alerts.absent.for }}"
+        - alert: YigNoctuaControllerPoorCooling
+          expr: max(ync_max{})-max(ync_ambient_temp{}) > {{ .Values.alerts.poorCooling.threshold }}
+          for: {{ .Values.alerts.poorCooling.for }}
+          labels:
+            severity: {{ .Values.alerts.poorCooling.severity }}
+            {{- with .Values.alerts.alertLabels }}
+            {{ toYaml . }}
+            {{- end }}
+          annotations:
+            summary: "YigNoctuaController Poor Cooling"
+            description: "YigNoctuaController is poorly cooling (delta {{"{{"}} $value }}°C) for over {{ .Values.alerts.poorCooling.for }}"
+{{- end }}

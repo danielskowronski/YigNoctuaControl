@@ -3,5 +3,5 @@ apiVersion: v2
 name: yignoctuacontrol-exporter
 description: yignoctuacontrol-exporter
 type: application
-version: 0.2.0a9
-appVersion: "0.2a9"
+version: 0.2.2
+appVersion: "0.2"

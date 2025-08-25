@@ -3,8 +3,40 @@ name: yignoctuacontrol-exporter
 namespace: monitoring-system
 image:
   name: danielskowronski/yignoctuacontrol-exporter
-  tag: "0.1"
+  tag: "0.2"
   pullPolicy: IfNotPresent
-serialPort: /dev/ync
-loglevel: INFO # CRITICAL/ERROR/WARNING/INFO/DEBUG
-tcpPort: 65000
+exporter:
+  serialPortId: "usb-Silicon_Labs_YNC_YNC0001-if00-port0" # see /dev/serial/by-id/
+  loglevel: INFO # CRITICAL/ERROR/WARNING/INFO/DEBUG
+  tcpPort: 65000
+alerts:
+  enabled: true
+
+  # Labels to add to the PrometheusRule CRD
+  # (e.g. to select which Prometheus instance should load these rules)
+  crdLabels:
+    release: kube-prometheus-stack
+
+  # Labels to add to each alert, useful for routing in Alertmanager
+  alertLabels:
+    monitor_svc: thermal
+
+  dutyCritical:
+    threshold: 95
+    for: 15m
+    severity: error
+  absent:
+    for: 15m
+    severity: error
+  tempCritical:
+    threshold: 45
+    for: 5m
+    severity: error
+  tempWarning:
+    threshold: 38
+    for: 10m
+    severity: warning
+  poorCooling:
+    threshold: 12
+    for: 30m
+    severity: warning
